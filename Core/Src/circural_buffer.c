@@ -3,6 +3,7 @@
 CBufStatus CBufInit(CBufType *cbuf) {
   cbuf->tail = 0;
   cbuf->head = 0;
+  cbuf->parsable = false;
   CBufStatus status = cbufok;
   status = CBufIsEmpty(cbuf);
   if (status == cbufempty) {
@@ -35,6 +36,10 @@ CBufStatus CBufPush(CBufType *cbuf, uint16_t val) {
     cbuf->body[cbuf->head] = val;
     cbuf->head = (cbuf->head + 1) % BUF_SIZE;
     status = CBufIsFull(cbuf);
+    if (val == '\n') {
+      cbuf->parsable = true;
+    };
+
     return status;
   } else if (status == cbuffull) {
     return status;
@@ -48,6 +53,9 @@ CBufStatus CBufPop(CBufType *cbuf, uint16_t *destination) {
   CBufStatus status = CBufIsEmpty(cbuf);
   if (status == cbufok) {
     *destination = cbuf->body[cbuf->tail];
+    if (cbuf->body[cbuf->tail] == '\n') {
+      cbuf->parsable = false;
+    }
     cbuf->tail = (cbuf->tail + 1) % BUF_SIZE;
     status = CBufIsEmpty(cbuf);
     return status;
@@ -58,3 +66,5 @@ CBufStatus CBufPop(CBufType *cbuf, uint16_t *destination) {
     return cbuferror;
   }
 }
+
+bool CBufIsParsable(CBufType *cbuf) { return cbuf->parsable; }

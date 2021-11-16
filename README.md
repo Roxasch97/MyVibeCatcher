@@ -30,7 +30,7 @@ And additionally, a Python-based GUI, which will be:
 - Including data-plotting and analyzing "studio", by which i mean FFT, and probably some data filters
 
 ### Additionally
-I'm going to try to use TDD metodology, successfully i hope. Which I expect will be quite difficult due to usage of HAL drivers.
+I'm going to try to use TDD methodology, successfully i hope. Which I expect will be quite difficult due to usage of HAL drivers.
 
 I'll try to document important decisions, changes of assumptions and mine reflections in kind of devstories in appropriate direction in project body.
 

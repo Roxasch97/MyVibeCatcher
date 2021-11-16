@@ -3,163 +3,153 @@
 #include "circural_buffer.h"
 #include "unity.h"
 
-void setUp(void) {}
+CBufStatus status;
+CBufType buf;
+uint16_t test_value = 0xB00B;
+uint16_t read_destination = 0;
+
+void setUp(void) {
+
+  CBufInit(&buf);
+  read_destination = 0;
+  test_value = 0xB00B;
+}
 
 void tearDown(void) {}
 
 void test_circural_buffer_EmptyAfterInit(void) {
-  CBufStatus status;
-  CBufType buf;
+
   status = CBufInit(&buf);
   TEST_ASSERT_EQUAL(cbufempty, status);
 }
 
 void test_circural_buffer_CBufIsEmptyReturnsEmptyWhenEmpty(void) {
 
-  CBufStatus status;
-  CBufType buf;
-  CBufInit(&buf);
   status = CBufIsEmpty(&buf);
   TEST_ASSERT_EQUAL(cbufempty, status);
 }
 
 void test_circural_buffer_CBufIsEmptyReturnsOkWhenNotEmpty(void) {
-  CBufStatus status;
-  CBufType buf;
-  CBufInit(&buf);
-  CBufPush(&buf, 0xB00B);
+
+  CBufPush(&buf, test_value);
   status = CBufIsEmpty(&buf);
   TEST_ASSERT_EQUAL(cbufok, status);
 }
 
 void test_circural_buffer_CBufIsFullReturnsFullWhenFull(void) {
-  CBufStatus status;
-  CBufType buf;
-  CBufInit(&buf);
+
   for (int i = 0; i < BUF_SIZE - 1; i++) {
-    CBufPush(&buf, 0xB00B);
+    CBufPush(&buf, test_value);
   }
   status = CBufIsFull(&buf);
   TEST_ASSERT_EQUAL(cbuffull, status);
 }
 
 void test_circural_buffer_NotEmptyAfterWriting(void) {
-  CBufType buf;
-  CBufInit(&buf);
-  uint16_t var = 0xB00B;
-  CBufPush(&buf, var);
+
+  CBufPush(&buf, test_value);
   TEST_ASSERT_FALSE(CBufIsEmpty(&buf));
 }
 
 void test_circural_buffer_ReturnsWrittenVar(void) {
-  CBufType buf;
-  CBufInit(&buf);
-  uint16_t var = 0xB00B;
-  CBufPush(&buf, var);
-  uint16_t destination = 0;
-  CBufPop(&buf, &destination);
-  TEST_ASSERT_EQUAL_UINT16(var, destination);
+
+  CBufPush(&buf, test_value);
+  CBufPop(&buf, &read_destination);
+  TEST_ASSERT_EQUAL_UINT16(test_value, read_destination);
 }
 
 void test_circural_buffer_HeadLoopsAtTheEdges(void) {
 
-  CBufType buf;
-  CBufInit(&buf);
-  uint16_t pop_destination;
-  int i = 0;
-  for (i; i < BUF_SIZE; i++) {
-    uint16_t var = i;
-    CBufPush(&buf, var);
-    CBufPop(&buf, &pop_destination);
+  for (int i = 0; i < BUF_SIZE; i++) {
+    test_value = i;
+    CBufPush(&buf, test_value);
+    CBufPop(&buf, &read_destination);
   }
   TEST_ASSERT_EQUAL_UINT16(0, buf.head);
 }
 
 void test_circural_buffer_CBufPushReturnsFullWhenWrittenToFull(void) {
-  CBufStatus status;
-  CBufType buf;
-  CBufInit(&buf);
+
   for (int i = 0; i < BUF_SIZE; i++) {
-    status = CBufPush(&buf, 0xB00B);
+    status = CBufPush(&buf, test_value);
   }
   TEST_ASSERT_EQUAL(cbuffull, status);
 }
 
 void test_circural_buffer_CBufPushDontOverwriteWhenFull(void) {
-  CBufStatus status;
-  CBufType buf;
-  CBufInit(&buf);
+
   CBufPush(&buf, 0xADA);
   for (int i = 0; i < BUF_SIZE; i++) {
-    CBufPush(&buf, 0xB00B);
+    CBufPush(&buf, test_value);
   }
-  uint16_t read_val = 0;
-  CBufPop(&buf, &read_val);
-  TEST_ASSERT_EQUAL(0xADA, read_val);
+  CBufPop(&buf, &read_destination);
+  TEST_ASSERT_EQUAL(0xADA, read_destination);
 }
 
 void test_circural_buffer_CBufPushReturnsFullWhenFilled(void) {
-  CBufStatus status;
-  CBufType buf;
-  CBufInit(&buf);
-  CBufPush(&buf, 0xADA);
-  for (int i = 0; i < BUF_SIZE - 2; i++) {
-    CBufPush(&buf, 0xB00B);
+
+  for (int i = 0; i < BUF_SIZE - 1; i++) {
+    CBufPush(&buf, test_value);
   }
-  status = CBufPush(&buf, 0xB00B);
+  status = CBufPush(&buf, test_value);
   TEST_ASSERT_EQUAL(cbuffull, status);
 }
 
 void test_circural_buffer_TailLoopsAtTheEdges(void) {
 
-  CBufType buf;
-  CBufInit(&buf);
-  CBufPush(&buf, 0xB00B);
-  uint16_t destination;
+  CBufPush(&buf, test_value);
   for (int i = 0; i < BUF_SIZE; i++) {
-    CBufPush(&buf, 0xB00B);
-    CBufPop(&buf, &destination);
+    CBufPush(&buf, test_value);
+    CBufPop(&buf, &read_destination);
   }
   TEST_ASSERT_EQUAL_UINT16(0, buf.tail);
 }
 
 void test_circural_buffer_PopReturnCbufokWhenRead(void) {
-  CBufType buf;
-  CBufStatus status;
-  CBufInit(&buf);
-  CBufPush(&buf, 0xB00B);
-  CBufPush(&buf, 0xB00B);
-  uint16_t destination;
-  status = CBufPop(&buf, &destination);
+
+  CBufPush(&buf, test_value);
+  CBufPush(&buf, test_value);
+  status = CBufPop(&buf, &read_destination);
   TEST_ASSERT_EQUAL(cbufok, status);
 }
 
 void test_circural_buffer_PopReturnCbufemptyWhenFullyRead(void) {
-  CBufType buf;
-  CBufStatus status;
-  CBufInit(&buf);
-  CBufPush(&buf, 0xB00B);
-  uint16_t destination;
-  status = CBufPop(&buf, &destination);
+
+  CBufPush(&buf, test_value);
+  status = CBufPop(&buf, &read_destination);
   TEST_ASSERT_EQUAL(cbufempty, status);
 }
 
 void test_circural_buffer_PopReturnCbufemptyWhenReadEmpty(void) {
-  CBufType buf;
-  CBufStatus status;
-  CBufInit(&buf);
-  uint16_t destination;
-  status = CBufPop(&buf, &destination);
+
+  status = CBufPop(&buf, &read_destination);
   TEST_ASSERT_EQUAL(cbufempty, status);
 }
 
 void test_circural_buffer_PopReturnWrittenVar(void) {
-  CBufType buf;
-  CBufStatus status;
-  CBufInit(&buf);
-  CBufPush(&buf, 0xB00B);
-  uint16_t destination;
-  status = CBufPop(&buf, &destination);
-  TEST_ASSERT_EQUAL(0xB00B, destination);
+
+  CBufPush(&buf, test_value);
+  status = CBufPop(&buf, &read_destination);
+  TEST_ASSERT_EQUAL(test_value, read_destination);
 }
+
+void test_circural_buffer_GetsParsableWhenNewLineWritten(void) {
+
+  CBufPush(&buf, '\n');
+  TEST_ASSERT(buf.parsable);
+}
+
+void test_circural_buffer_NotGetParsableWhenNewLineNotWritten(void) {
+
+  CBufPush(&buf, test_value);
+  TEST_ASSERT_FALSE(buf.parsable);
+}
+
+void test_circural_buffer_GetsNotParsableWhenNewLineRead(void) {
+
+  CBufPush(&buf, '\n');
+  CBufPop(&buf, &read_destination);
+  TEST_ASSERT_FALSE(buf.parsable);
+}
+
 #endif // TEST
