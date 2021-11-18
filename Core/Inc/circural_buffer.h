@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define BUF_SIZE 8
+#define BUF_SIZE 50
 
 typedef struct {
 

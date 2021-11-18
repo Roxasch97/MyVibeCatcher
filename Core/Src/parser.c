@@ -1,7 +1,9 @@
 #include "parser.h"
 
+
 ParserStatus ParserTakeLine(CBufType *buf, char *destination)
 {
+	CBufStatus status = cbufok;
 	uint8_t i = 0;
 	uint16_t Temp = 0;
 	do
@@ -17,5 +19,5 @@ ParserStatus ParserTakeLine(CBufType *buf, char *destination)
 				}
 			i++;
 	}
-	while(Temp != EOL);
+	while(Temp != EOL && i<50);
 }
