@@ -125,3 +125,5 @@ local.properties
 
 build/test
 *.txt
+/Debug/
+/Doc

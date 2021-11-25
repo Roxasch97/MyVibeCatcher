@@ -5,8 +5,6 @@
 #include "unity.h"
 #include <stdlib.h>
 
-#define COUNT_OF(arr) (sizeof(arr) / sizeof(0 [arr]))
-
 CBufType buf;
 ParserStatus status;
 char take_line_destination[10];
@@ -128,6 +126,14 @@ void test_parser_ParseReturnParseroverfloved(void) {
   status = ParserParse(take_line_destination, parsed_text, false,
                        COUNT_OF(parsed_text));
   TEST_ASSERT_EQUAL(parseroverflowed, status);
+}
+
+void test_parser_ParseCreatesNullTerminatedStr(void) {
+
+	ParserTakeLine(&buf, take_line_destination, COUNT_OF(take_line_destination));
+	ParserParse(take_line_destination, parsed_text, false, COUNT_OF(parsed_text));
+	TEST_ASSERT_EQUAL_STRING("H", parsed_text);
+
 }
 
 #endif // TEST

@@ -28,7 +28,7 @@ ParserStatus ParserParse(char input_string[], char *destination, bool reenter,
   if (reenter == true) {
     tmp = strtok(NULL, "#");
     while (tmp[i] != '\0') {
-      if (i >= destination_size) {
+      if (i >= destination_size-1) {
         return parseroverflowed;
       }
       destination[i] = tmp[i];
@@ -37,7 +37,7 @@ ParserStatus ParserParse(char input_string[], char *destination, bool reenter,
   } else {
     tmp = strtok(input_string, "#");
     while (tmp[i] != '\0') {
-      if (i >= destination_size) {
+      if (i >= destination_size-1) {
         return parseroverflowed;
       }
       destination[i] = tmp[i];
@@ -45,5 +45,6 @@ ParserStatus ParserParse(char input_string[], char *destination, bool reenter,
     }
   }
 
+  destination[i] = '\0';
   return parserok;
 }

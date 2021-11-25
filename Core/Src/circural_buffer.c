@@ -1,10 +1,17 @@
+/***
+ * @file           : circural_buffer.c
+ * @brief          : Circural buffer implementation body
+ */
+
 #include "circural_buffer.h"
 
 CBufStatus CBufInit(CBufType *cbuf) {
+  CBufStatus status = cbufok;
+
   cbuf->tail = 0;
   cbuf->head = 0;
   cbuf->parsable = false;
-  CBufStatus status = cbufok;
+
   status = CBufIsEmpty(cbuf);
   if (status == cbufempty) {
     return cbufempty;
